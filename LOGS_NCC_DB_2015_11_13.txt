@@ -1,0 +1,34 @@
+13/11/2015 13:46:45.584 - [databaseUpdateThread.mainTask.main] - [INFO] - [CLEANER CELL PARAM DELETE END]
+13/11/2015 13:46:45.624 - [databaseUpdateThread.mainTask.main] - [INFO] - UPDATER ADDED TO POOL
+13/11/2015 13:46:45.624 - [databaseUpdateThread.mainTask.main] - [INFO] - START POOL
+13/11/2015 13:46:45.634 - [poolThread.Pool.start] - [INFO] - POOL START
+13/11/2015 13:46:45.634 - [poolThread.Pool.start] - [INFO] - POOL START
+13/11/2015 13:46:45.634 - [poolThread.Pool.start] - [INFO] - POOL END
+13/11/2015 13:46:45.634 - [poolThread.GrupaZadan.run] - [INFO] - [MML_Ucell]START GRUPY ZADAN
+13/11/2015 13:46:45.634 - [poolThread.Pool.start] - [INFO] -  STATUS POOLafalse false java.util.concurrent.ThreadPoolExecutor@10900d2[Running, pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0]
+13/11/2015 13:46:45.634 - [poolThread.Pool.start] - [INFO] - POOL SHUTDOWNtrue 
+13/11/2015 13:46:45.634 - [databaseUpdateThread.mainTask$1.run] - [INFO] - NORTH_UPDATES_START
+13/11/2015 13:46:45.634 - [databaseUpdateThread.mainTask$1.run] - [INFO] - NORTH_UPDATES_END
+13/11/2015 13:46:45.634 - [MML_UPDATER.MML_Updater_parrent.run] - [INFO] - [MML_UCELL_KATRNC4] START
+13/11/2015 13:47:50.526 - [MML_UPDATER.MML_Updater_parrent.run] - [INFO] - [MML_UCELL_KATRNC4] END ERROR SUCCED=false  
+13/11/2015 13:47:50.526 - [.] - [FINER] - THROWjava.util.concurrent.ExecutionException: java.lang.OutOfMemoryError: Java heap space
+	java.util.concurrent.FutureTask.report(FutureTask.java:122)
+	java.util.concurrent.FutureTask.get(FutureTask.java:188)
+	poolThread.GrupaZadan.run(GrupaZadan.java:98)
+	java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:471)
+	java.util.concurrent.FutureTask.run(FutureTask.java:262)
+	java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1145)
+	java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:615)
+	java.lang.Thread.run(Thread.java:745)
+
+13/11/2015 13:47:50.526 - [poolThread.GrupaZadan.run] - [INFO] - [MML_Ucell]ZAKONCZONO GRUPE ZADAN 
+13/11/2015 13:47:50.526 - [poolThread.GrupaZadan.run] - [INFO] - [MML_Ucell] EXECUTOR  GRUPY ZADAN SHUTDOWN=true 
+13/11/2015 13:47:50.526 - [poolThread.Pool.start] - [INFO] - POOL END
+13/11/2015 13:47:50.526 - [poolThread.Pool.start] - [INFO] -  STATUS POOLafalse false java.util.concurrent.ThreadPoolExecutor@f1d0a3[Running, pool size = 1, active threads = 0, queued tasks = 0, completed tasks = 1]
+13/11/2015 13:47:50.526 - [poolThread.Pool.start] - [INFO] - POOL SHUTDOWNtrue 
+13/11/2015 13:47:50.526 - [databaseUpdateThread.mainTask$2.run] - [INFO] - MML_UPDATES_START
+13/11/2015 13:47:50.526 - [databaseUpdateThread.mainTask$2.run] - [INFO] - MML_UPDATES_END
+13/11/2015 13:47:50.526 - [databaseUpdateThread.mainTask.main] - [INFO] - [CLEANER NodeB/AdjNode Ident]START
+13/11/2015 13:47:50.616 - [databaseUpdateThread.mainTask.main] - [INFO] - [CLEANER NodeB/AdjNode Ident]END
+13/11/2015 13:47:50.616 - [databaseUpdateThread.mainTask.main] - [INFO] - UPDATE DB END
+13/11/2015 13:47:50.616 - [databaseUpdateThread.mainTask.main] - [OFF] - POMYSLNE ZAKONCZENIE DZIALANIA APLIKACJI

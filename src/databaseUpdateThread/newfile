@@ -1,0 +1,428 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package databaseUpdateThread;
+
+
+import Sprzataczka.CLEANER_UPDATER;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+import Sprzataczka.Emailer;
+import Sprzataczka.Sprzataczka;
+import poolThread.UpdaterInterface;
+import poolThread.GrupaZadan;
+import poolThread.Pool;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
+import java.util.logging.FileHandler;
+//import java.util.logging.Logger;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+import mysqlpackage.*;
+import nbipackage.NewFile;
+import java.util.logging.*;
+import java.util.Locale;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
+
+/**
+ *
+ * @author turczyt
+ */
+public class RaportKomerTest {
+
+    /**
+     * @param args the command line arguments
+     */
+    static Pool pool;
+
+
+    public static void main(String[] args)
+    {
+	System.out.println("STARTTTTT");
+	java.util.logging.Logger logger=Logger.getLogger("InfoLogging");
+	logger.log(Level.FINEST, "###START####");
+	try
+	{
+	   java.util.Date DataDzisiaj=java.util.Calendar.getInstance().getTime();
+	   String DATE_FORMAT_NOW = "yyyy_MM_dd";
+	   java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT_NOW);
+	   String obecnyDzienCzas=sdf.format(DataDzisiaj);
+
+
+
+
+
+
+	    NewFile sprzTEST=null;
+	   boolean bezUpdate=false;
+	   if(args.length>0&&args[0].equalsIgnoreCase("-r"))
+	   {
+	       bezUpdate=true;
+	       sprzTEST=new NewFile("/usr/samba/utran/PP/UtranRaportKomercyjnosci/TESTOWA_SPRZ_OUT_"+obecnyDzienCzas+".txt");
+
+	   }
+	   else
+	   {
+	       sprzTEST=new NewFile("/usr/samba/utran/PP/UtranRaportKomercyjnosci/TESTOWA_SPRZ_OUT_"+obecnyDzienCzas+".txt");
+	   }
+	   String loggerPath="/usr/samba/utran/PP/UtranRaportKomercyjnosci/LOGS_"+obecnyDzienCzas+".txt";
+
+
+
+
+	   sprzTEST.dopisz("###################"+DataDzisiaj+"###################\r\n");
+	   FileHandler fh= new FileHandler(loggerPath);
+
+	   fh.setLevel(Level.ALL);
+	   ConsoleHandler handler = new ConsoleHandler();
+	   handler.setLevel(Level.ALL);
+
+	   LogFormater formatter = new LogFormater();
+	   fh.setFormatter(formatter);
+	   handler.setFormatter(formatter);
+	   logger.addHandler(fh);
+	   logger.addHandler(handler);
+	   logger.setLevel(Level.ALL);
+
+
+
+
+	    mysqlpackage.DataSource DOA=DataSource.getInstance();
+	    pool=new Pool(DOA,logger);
+	    GrupaZadan repeater_update=new GrupaZadan(1,"UPDATE_REPEATERSSS",logger);
+	    repeater_update.add(new Repeaters_Updater("REPEATERS","/usr/samba/utran/PP/Raports/Repeaters.xml",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+	    GrupaZadan node_type_update=new GrupaZadan(8,"UPDATE NODES TYPE",logger);
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("WAR2_NODEB_TYPE","WAWRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("POZ2_NODEB_TYPE","POZRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("POZ3_NODEB_TYPE","POZRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("WAR3_NODEB_TYPE","WAWRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("GDA3_NODEB_TYPE","GDARNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("KAT3_NODEB_TYPE","KATRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("GDA4_NODEB_TYPE","GDARNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("WAR4_NODEB_TYPE","WAWRNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("KAT2_NODEB_TYPE","KATRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_type_update.add(new NodeB_Type_perRnc_Updater("KAT5_NODEB_TYPE","KATRNC5",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+	    GrupaZadan ucell_update=new GrupaZadan(3,"UPDATE UCELLS",logger);
+	    ucell_update.add(new Ucell_perRnc_Updater("WAR2_UCELL","WAWRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ucell_update.add(new Ucell_perRnc_Updater("POZ2_UCELL","POZRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+	    ucell_update.add(new Ucell_perRnc_Updater("GDA3_UCELL","GDARNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ucell_update.add(new Ucell_perRnc_Updater("WAR3_UCELL","WAWRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    ucell_update.add(new Ucell_perRnc_Updater("POZ3_UCELL","POZRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ucell_update.add(new Ucell_perRnc_Updater("KAT3_UCELL","KATRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ucell_update.add(new Ucell_perRnc_Updater("GDA4_UCELL","GDARNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ucell_update.add(new Ucell_perRnc_Updater("WAR4_UCELL","WAWRNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    ucell_update.add(new Ucell_perRnc_Updater("KAT2_UCELL","KATRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ucell_update.add(new Ucell_perRnc_Updater("KAT5_UCELL","KATRNC5",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+
+	    GrupaZadan node_update=new GrupaZadan(4,"UPDATE NODEBS",logger);
+	    node_update.add(new NodeB_perRnc_Updater("WAR2_NODEB","WAWRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("POZ2_NODEB","POZRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    node_update.add(new NodeB_perRnc_Updater("GDA3_NODEB","GDARNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("KAT2_NODEB","KATRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("WAR3_NODEB","WAWRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("POZ3_NODEB","POZRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    node_update.add(new NodeB_perRnc_Updater("KAT3_NODEB","KATRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("GDA4_NODEB","GDARNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("WAR4_NODEB","WAWRNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("KAT2_NODEB","KATRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    node_update.add(new NodeB_perRnc_Updater("KAT5_NODEB","KATRNC5",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+
+	    GrupaZadan brd_update=new GrupaZadan(4,"UPDATE 3GBRD",logger);
+	    brd_update.add(new Brd_perRnc_Updater("WAR2_3G_BRD","WAWRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    brd_update.add(new Brd_perRnc_Updater("KAT3_3G_BRD","KATRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    brd_update.add(new Brd_perRnc_Updater("POZ2_3G_BRD","POZRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    brd_update.add(new Brd_perRnc_Updater("POZ3_3G_BRD","POZRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    brd_update.add(new Brd_perRnc_Updater("WAR3_3G_BRD","WAWRNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    brd_update.add(new Brd_perRnc_Updater("GDA3_3G_BRD","GDARNC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    brd_update.add(new Brd_perRnc_Updater("KAT2_3G_BRD","KATRNC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    brd_update.add(new Brd_perRnc_Updater("GDA4_3G_BRD","GDARNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    brd_update.add(new Brd_perRnc_Updater("WAR4_3G_BRD","WAWRNC4",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    brd_update.add(new Brd_perRnc_Updater("KAT5_3G_BRD","KATRNC5",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+
+	    GrupaZadan enode_update=new GrupaZadan(4,"UPDATE ENODES",logger);
+	    enode_update.add(new EnodeB_perM2000_Updater("GDA_ENODEB","GDA",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    enode_update.add(new EnodeB_perM2000_Updater("POZ_ENODEB","POZ",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    enode_update.add(new EnodeB_perM2000_Updater("WAR_ENODEB","WAW",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    enode_update.add(new EnodeB_perM2000_Updater("KAT_ENODEB","KAT",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+	    GrupaZadan ecell_update=new GrupaZadan(4,"UPDATE ECELLS",logger);
+	    ecell_update.add(new Ecell_perM2000_Updater("WAR_ECELL","WAW",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ecell_update.add(new Ecell_perM2000_Updater("GDA_ECELL","GDA",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ecell_update.add(new Ecell_perM2000_Updater("POZ_ECELL","POZ",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    ecell_update.add(new Ecell_perM2000_Updater("KAT_ECELL","KAT",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+
+
+	    GrupaZadan gcell_update=new GrupaZadan(5,"UPDATE GCELLS",logger);
+	    gcell_update.add(new Gcell_perBsc_Updater("WAR1_GCELL","WAWBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("WAR2_GCELL","WAWBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("GDA2_GCELL","GDABSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("KAT2_GCELL","KATBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("POZ1_GCELL","POZBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    gcell_update.add(new Gcell_perBsc_Updater("KAT3_GCELL","KATBSC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("KAT1_GCELL","KATBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("GDA1_GCELL","GDABSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("POZ2_GCELL","POZBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    gcell_update.add(new Gcell_perBsc_Updater("WAR3_GCELL","WAWBSC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+
+	    GrupaZadan Bts_update=new GrupaZadan(5,"UPDATE BTS",logger);
+	    Bts_update.add(new Bts_perBsc_Updater("WAR2_BTS","WAWBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("GDA1_BTS","GDABSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("KAT1_BTS","KATBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("WAR2_BTS","WAWBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("POZ1_BTS","POZBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    Bts_update.add(new Bts_perBsc_Updater("WAR3_BTS","WAWBSC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("GDA2_BTS","GDABSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("KAT2_BTS","KATBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("KAT3_BTS","KATBSC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Bts_update.add(new Bts_perBsc_Updater("POZ2_BTS","POZBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+
+	    GrupaZadan Brd_perBsc_update=new GrupaZadan(4,"UPDATE GBRD",logger);
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("WAR1_2G_BRD","WAWBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("GDA1_2G_BRD","GDABSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("POZ1_2G_BRD","POZBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("KAT2_2G_BRD","KATBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("WAR3_2G_BRD","WAWBSC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("KAT3_2G_BRD","KATBSC3",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("GDA2_2G_BRD","GDABSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("POZ2_2G_BRD","POZBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("KAT1_2G_BRD","KATBSC1",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+	    Brd_perBsc_update.add(new Brd_perBsc_Updater("WAR2_2G_BRD","WAWBSC2",UpdaterInterface.ADD,logger,DOA,sprzTEST));
+
+
+	    logger.info("Create ALL UPDATER END");
+
+
+
+	    pool.add2KolejkaGrup(repeater_update);
+	    pool.add2KolejkaGrup(node_type_update);
+	    pool.add2KolejkaGrup(ucell_update);
+	    pool.add2KolejkaGrup(brd_update);
+
+	    pool.add2KolejkaGrup(node_update);
+	    pool.add2KolejkaGrup(gcell_update);
+	    pool.add2KolejkaGrup(Brd_perBsc_update);
+	    pool.add2KolejkaGrup(Bts_update);
+	    pool.add2KolejkaGrup(enode_update);
+
+	    pool.add2KolejkaGrup(ecell_update);
+
+
+
+
+            if(!bezUpdate)
+	    {
+		logger.info("UPDATER ADDED TO POOL");
+		logger.info("START POOL");
+		pool.start();
+		pool.join();
+		logger.info("UPDATE DB END");
+	    }
+
+	    try
+	    {
+		if(!bezUpdate)
+		{
+		Connection connection = DOA.getConnection();
+		Statement testStatement=connection.createStatement();
+
+		String [] regionName=new String[]{"WAW","KAT","POZ","GDA"};
+		String [] attachPath=new String[regionName.length];
+
+		for(int r=0;r<regionName.length;r++)
+		{
+		    attachPath[r]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/"+regionName[r]+"_UNBLOCKED_"+obecnyDzienCzas+".csv";
+		    NewFile att=new NewFile(attachPath[r],"n");
+		    String req2G="select bt.Bts_Name as NE_NAME, g.Cell_Name,k.Last_Update as komercjalizacja,c.Actual_stat_blk,c.Last_stat_blk,c.Act_Update,c.Last_Update,c.Cell_Index as CELL_IDENT_IN_DB from raport_konfiguracja_aktualna.cell_on_air_stat c  left join oncall.konfiguracja_aktualna_gcell g on(g.Cell_Index=c.Cell_Index) left join oncall.komercyjnosc_komorek_gcell k on(k.Cell_Index=c.Cell_Index) left join oncall.konfiguracja_aktualna_bts bt on(bt.Bts_Index=g.Bts_Index) where (bt.Region="+(r+1)+" and c.Actual_stat_blk!=c.Last_stat_blk and c.Actual_stat_blk like 'Unlock' and c.System='2' and not exists((select gg.* from oncall.komercyjnosc_komorek_gcell gg where (gg.Last_Update > c.Last_Update and gg.Last_Update < c.Act_Update and c.Cell_Index=gg.Cell_Index))));";
+		    ResultSet res=testStatement.executeQuery(req2G);
+		    OdpowiedzSQL kom2g=Baza.createAnswer(res);
+
+		    String req3G="select nt.NodebName as NE_NAME, g.Cell_Name,k.Last_Update as komercjalizacja ,c.Actual_stat_blk,c.Last_stat_blk,c.Act_Update,c.Last_Update,c.Cell_Index  as CELL_IDENT_IN_DB from raport_konfiguracja_aktualna.cell_on_air_stat c  left join oncall.konfiguracja_aktualna_ucell g on(g.Cell_Index=c.Cell_Index) left join oncall.komercyjnosc_komorek_ucell k on (c.Cell_Index=k.Cell_Index) left join oncall.konfiguracja_aktualna_NodebType nt on( g.Nodeb_Index=nt.Ne_index) where ( nt.Region="+(r+1)+" and c.Actual_stat_blk like 'UNBLOCKED' and c.Actual_stat_blk!=c.Last_stat_blk and c.System='3' and not exists((select gg.*,c.* from oncall.komercyjnosc_komorek_ucell gg  where (gg.Last_Update > c.Last_Update and gg.Last_Update < c.Act_Update and c.Cell_Index=gg.Cell_Index))));";
+		    ResultSet res3G=testStatement.executeQuery(req3G);
+		    OdpowiedzSQL kom3g=Baza.createAnswer(res3G);
+
+		    att.dopisz("NE_Name;Cell_Name;komercjalizacja;Actual_stat_blk;Last_stat_blk;Act_Update;Last_Update;CELL_IDENT_IN_DB\r\n");
+
+		    for(int g=0;g<kom2g.rowCount();g++)
+		    {
+			for(int k=0;k<kom2g.kolumnCount();k++)
+			{
+			    String val=kom2g.getValue(k, g);
+			    if(val==null||val.equals(""))
+				val="#";
+			    att.dopisz(val+";");
+			}
+			att.dopisz("\r\n");
+		    }
+
+		    att.dopisz(";;;;;;;;;;;;;;\r\n");
+		    att.dopisz(";;;;;;;;;;;;;;\r\n");
+		    att.dopisz(";;;;;;;;;;;;;;\r\n");
+
+		    for(int g=0;g<kom3g.rowCount();g++)
+		    {
+			for(int k=0;k<kom3g.kolumnCount();k++)
+			{
+			    String val=kom3g.getValue(k, g);
+			    if(val==null||val.equals(""))
+				val="#";
+			    att.dopisz(val+";");
+			}
+			att.dopisz("\r\n");
+		    }
+		}
+
+		String[] attachPath2=new String[6];
+		attachPath2[0]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/NIEKOMERCYJNE_ODBLOKOWANE_2G"+obecnyDzienCzas+".csv";
+		attachPath2[1]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/KOMERCYJNE_ZABLOKOWANE_2G"+obecnyDzienCzas+".csv";
+		attachPath2[2]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/NIEKOMERCYJNE_ODBLOKOWANE_3G"+obecnyDzienCzas+".csv";
+		attachPath2[3]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/KOMERCYJNE_ZABLOKOWANE_3G"+obecnyDzienCzas+".csv";
+		attachPath2[4]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/NIEKOMERCYJNE_ODBLOKOWANE_LTE"+obecnyDzienCzas+".csv";
+		attachPath2[5]="/usr/samba/utran/PP/UtranRaportKomercyjnosci/KOMERCYJNE_ZABLOKOWANE_LTE"+obecnyDzienCzas+".csv";
+
+		//NIEKOMERCYJNE ODBLOKOWANE 2G
+		NewFile att=new NewFile(attachPath2[0],"n");
+
+		String reqU="select g.Cell_Index,g.Cell_Name,g.Status_Blk ,g.System ,kk.Status_komercyjnosci,kk.Last_Update as DataKomercjalizacji from oncall.konfiguracja_aktualna_gcell g left join oncall.komercyjnosc_komorek_gcell kk on(kk.Cell_Index=g.Cell_Index) where (g.Status_Blk!='Lock' and g.Status_Blk!='Shutdown' and not exists(select * from oncall.komercyjnosc_komorek_gcell k where (k.cell_index=g.Cell_Index and k.Status_komercyjnosci=1)));";
+		ResultSet res=testStatement.executeQuery(reqU);
+		OdpowiedzSQL komU=Baza.createAnswer(res);
+		att.dopisz(komU.toCSV());
+		att.dopisz("\r\n");
+
+		//KOMERCYJNE ZABLOKOWANE 2G
+		att=new NewFile(attachPath2[1],"n");
+		reqU="select g.Cell_Index,g.Cell_Name,g.Status_Blk ,g.System ,kk.Status_komercyjnosci,kk.Last_Update as DataKomercjalizacji from oncall.konfiguracja_aktualna_gcell g left join oncall.komercyjnosc_komorek_gcell kk on(kk.Cell_Index=g.Cell_Index) where (g.Status_Blk!='Unlock' and exists (select * from oncall.komercyjnosc_komorek_gcell k where (k.cell_index=g.Cell_Index and k.Status_komercyjnosci=1)));";
+		res=testStatement.executeQuery(reqU);
+		komU=Baza.createAnswer(res);
+		att.dopisz(komU.toCSV());
+		att.dopisz("\r\n");
+
+		//NIEKOMERCYJNE ODBLOKOWANE 3G
+		att=new NewFile(attachPath2[2],"n");
+		reqU="select g.Cell_Index,g.Cell_Name,g.Status_Blk ,g.System ,kk.Status_komercyjnosci,kk.Last_Update as DataKomercjalizacji from oncall.konfiguracja_aktualna_ucell g left join oncall.komercyjnosc_komorek_ucell kk on(kk.Cell_Index=g.Cell_Index) where (g.Status_Blk!='BLOCKED' and not exists(select * from oncall.komercyjnosc_komorek_ucell k where (k.cell_index=g.Cell_Index and k.Status_komercyjnosci=1)));";
+		res=testStatement.executeQuery(reqU);
+		komU=Baza.createAnswer(res);
+		att.dopisz(komU.toCSV());
+		att.dopisz("\r\n");
+
+		//KOMERCYJNE ZABLOKOWANE 3G
+		att=new NewFile(attachPath2[3],"n");
+		reqU="select g.Cell_Index,g.Cell_Name,g.Status_Blk ,g.System ,kk.Status_komercyjnosci,kk.Last_Update as DataKomercjalizacji from oncall.konfiguracja_aktualna_ucell g left join oncall.komercyjnosc_komorek_ucell kk on(kk.Cell_Index=g.Cell_Index) where (g.Status_Blk!='UNBLOCKED' and exists (select * from oncall.komercyjnosc_komorek_ucell k where (k.cell_index=g.Cell_Index and k.Status_komercyjnosci=1)));";
+		res=testStatement.executeQuery(reqU);
+		komU=Baza.createAnswer(res);
+		att.dopisz(komU.toCSV());
+		att.dopisz("\r\n");
+
+		//NIEKOMERCYJNE ODBLOKOWANE LTE
+		att=new NewFile(attachPath2[4],"n");
+		reqU="select g.Cell_Index,g.Cell_Name,g.Status_Ubl ,g.System ,kk.Status_komercyjnosci,kk.Last_Update as DataKomercjalizacji from oncall.konfiguracja_aktualna_ecell g left join oncall.komercyjnosc_komorek_ecell kk on(kk.Cell_Index=g.Cell_Index) where (g.Status_Ubl!='High block' and g.Status_Ubl!='Middle blo' and not exists(select * from oncall.komercyjnosc_komorek_ecell k where (k.cell_index=g.Cell_Index and k.Status_komercyjnosci=1)));";
+		res=testStatement.executeQuery(reqU);
+		komU=Baza.createAnswer(res);
+		att.dopisz(komU.toCSV());
+		att.dopisz("\r\n");
+
+		//KOMERCYJNE ZABLOKOWANE LTE
+		att=new NewFile(attachPath2[5],"n");
+		reqU="select g.Cell_Index,g.Cell_Name,g.Status_Ubl ,g.System ,kk.Status_komercyjnosci,kk.Last_Update as DataKomercjalizacji from oncall.konfiguracja_aktualna_ecell g left join oncall.komercyjnosc_komorek_ecell kk on(kk.Cell_Index=g.Cell_Index) where (g.Status_Ubl!='Unblock' and exists (select * from oncall.komercyjnosc_komorek_ecell k where (k.cell_index=g.Cell_Index and k.Status_komercyjnosci=1)));";
+		res=testStatement.executeQuery(reqU);
+		komU=Baza.createAnswer(res);
+		att.dopisz(komU.toCSV());
+		att.dopisz("\r\n");
+
+		testStatement.close();
+		connection.close();
+		//Emailer mail = new Emailer("mail.smtp.host", "172.16.5.38", "UTRAN_Operations@play.pl", new String[]{"TNMU-SekcjaUTRAN@play.pl","tomasz.szymanski@play.pl","andrzej.klapuch@play.pl","tomasz.kluczynski@play.pl","michal.globinski@play.pl","tomasz.trojanowski@play.pl","daniel.zaremba@play.pl","arkadiusz.szymaniak@play.pl"}, "Change ON_AIR CELLS STAT" , "",attachPath );
+		//Emailer mail = new Emailer("mail.smtp.host", "172.16.5.38", "UTRAN_Operations@play.pl", new String[]{"tomasz.turczynski@play.pl"}, "Change ON_AIR CELLS STAT" , "",attachPath );
+		//mail.send();
+
+		Emailer mail2 = new Emailer("mail.smtp.host", "172.16.5.38", "UTRAN_Operations@play.pl", new String[]{"TNMU-SekcjaUTRAN@play.pl","tomasz.szymanski@play.pl","andrzej.klapuch@play.pl","tomasz.kluczynski@play.pl","michal.globinski@play.pl","tomasz.trojanowski@play.pl","daniel.zaremba@play.pl","arkadiusz.szymaniak@play.pl"}, "CELLS STATUS CHECK REPORT" , "",attachPath2 );
+		//Emailer mail2 = new Emailer("mail.smtp.host", "172.16.5.38", "UTRAN_Operations@play.pl", new String[]{"tomasz.turczynski@play.pl"}, "CELLS STATUS CHECK REPORT" , "",attachPath2 );
+		mail2.send();
+		logger.log(Level.FINEST,"WYSLANIE EMAILI ON-AIR-STATUS");
+	    }
+
+	    }
+	    catch(Exception ee)
+	    {
+		logger.log(Level.FINEST, "ERROR", ee);
+	    }
+
+	    logger.info("START CREATE RAPORT FILES");
+	    LteFile.Lte_data_file_Creator lte=new LteFile.Lte_data_file_Creator("/usr/samba/utran/PP/UtranRaportKomercyjnosci/",logger);
+    	    try
+	    {
+		Connection connection = DOA.getConnection();
+		Statement testStatement=connection.createStatement();
+
+		NewFile saiOut=new NewFile("/usr/samba/utran/PP/Printouts/NEW_MML/UcellPerRnc.txt","n");
+		String req="select r.Rnc_Bsc_Name,n.Nodeb_Name, u.Cell_Name,u.Cell_Id,u.LocellId ,u.Lac_dec,u.Sac_dec,u.Rac_dec from oncall.konfiguracja_aktualna_ucell u,oncall.konfiguracja_aktualna_rnc_bsc r, oncall.konfiguracja_aktualna_nodeb n where( u.Nodeb_Index=n.Nodeb_Index and n.Rnc_Bsc_Index=r.Rnc_Bsc_Index);";
+		ResultSet res=testStatement.executeQuery(req);
+		OdpowiedzSQL kom3g=Baza.createAnswer(res);
+		saiOut.dopisz(kom3g.toString());
+
+		NewFile gciOut=new NewFile("/usr/samba/utran/PP/Printouts/NEW_MML/GcellPerBsc.txt","n");
+		String req2g="select r.Rnc_Bsc_Name,b.Bts_Name,g.Cell_Name,g.Cell_Id,g.Lac_dec,g.Ci_dec from oncall.konfiguracja_aktualna_bts b, oncall.konfiguracja_aktualna_gcell g, oncall.konfiguracja_aktualna_rnc_bsc r where (b.Rnc_Bsc_Index=r.Rnc_Bsc_Index and b.Bts_Index=g.Bts_Index);";
+		ResultSet res2g=testStatement.executeQuery(req2g);
+		OdpowiedzSQL kom2g=Baza.createAnswer(res2g);
+		gciOut.dopisz(kom2g.toString());
+		connection.close();
+	    }
+	    catch(Exception ee)
+	    {
+		logger.throwing("MAIN", "MAIN", ee);
+	    }
+	    //LteFile.Lte_data_file_Creator lte=new LteFile.Lte_data_file_Creator("C:\\PP_NETBEANS\\Utran_Raport_Komercyjnosci_data_geter\\TESTOWY_RAPORT\\");
+	    if(!bezUpdate)
+	    {
+		Emailer mail = new Emailer("mail.smtp.host", "172.16.5.38", "UTRAN_Operations@play.pl", new String[]{"tomasz.turczynski@play.pl","stanislaw.szypowski@play.pl"}, "Sprzataczka Raportu " , sprzTEST.getAll(), new String[]{sprzTEST.pass()});
+		mail.send();
+	    }
+	    logger.log(Level.OFF,"POMYSLNE ZAKONCZENIE DZIALANIA APLIKACJI");
+	    System.exit(0);
+	}
+	catch(Exception ee)
+	{
+	    ee.printStackTrace();
+	    logger.log(Level.FINEST, "BLAD W GLOWNYM WATKU", ee);
+	}
+    }
+}
