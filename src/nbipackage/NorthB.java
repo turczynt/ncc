@@ -15,8 +15,6 @@ import java.util.logging.Logger;
  */
 public class NorthB
 {
-
-
     String serwer ;
     Socket echoSocket ;
     PrintWriter out ;
@@ -32,7 +30,6 @@ public class NorthB
     long lastExecCommend;
     boolean throTimeOut;
     long oneCommTimeout=3000000;//5 minut na jedna komende po czym reconnect
-    String comparableCommandPart;
 
     /**
      *
@@ -45,6 +42,10 @@ public class NorthB
     public NorthB(String serwer,String login,String pass,String flagaSave) throws NBIAnsException
     {
 	System.runFinalizersOnExit(true);
+	this.in=null;
+	this.out=null;
+	this.echoSocket=null;
+
         this.zapFlag=false;
         this.serwer=serwer;
 	this.login=login;
@@ -90,11 +91,27 @@ public class NorthB
 	{
            // if(this!=null)
             //{
-            this.ostatniRegName="";
-        lastRegOperation="";
+	    try{
+		
+		if(this.echoSocket!=null)
+		{
+                    this.closeBuffor();
+		    /*this.in.close();
+		    this.in=null;
+		    this.out.close();
+		    this.out=null;
+		    this.echoSocket.close();*/
+
+		}
+	    }
+	    catch(Exception ee)
+	    {
+		ee.printStackTrace();
+	    }
+            lastRegOperation="";
             this.echoSocket = new Socket(serwer, 31114);
 	    //echoSocket.setSoTimeout(300000);
-	    this.echoSocket.setSoTimeout(900000);
+	   // this.echoSocket.setSoTimeout(900000);
             this.out = new PrintWriter(echoSocket.getOutputStream(), true);
             this.in = echoSocket.getInputStream();
             int im=13;
@@ -135,7 +152,7 @@ public class NorthB
 		return true;
 	    else
 	    {
-		System.out.println("DUPA PRZY INICJACJI");
+		System.out.println("DUPA PRZY INICJACJI:"+odp);
 
 	    }
             
@@ -172,6 +189,10 @@ public class NorthB
 
 	//try
 	//{
+
+
+	//this.in.skip(this.in.available());
+
 	if(this.zapFlag)
 		    logi.dopisz("\r\n");
 	throTimeOut=false;
@@ -198,11 +219,12 @@ public class NorthB
                 StringBuilder sb = new StringBuilder();
                 boolean found = false;
 	
-                char ch = (char) in.read();
-		if(this.zapFlag)
-		    logi.dopisz(ch);
-	        while (true &&!throTimeOut)
-                {
+                //char ch = (char) in.read();
+		int sign=0;
+		
+	       while((sign=in.read())>0)
+               {
+		   char ch=(char)sign;
 		    if(ch!=((char)-1))
                     sb.append(ch);
 		    if(ch!=((char)-1))
@@ -228,9 +250,9 @@ public class NorthB
 			}
                     }
 
-                    ch = (char) in.read();
+                   /* ch = (char) in.read();
 		    if(this.zapFlag)
-			logi.dopisz(ch);
+			logi.dopisz(ch);*/
 		   // if(this.zapFlag)
 			//logi.dopisz(Character.toString(ch));
                 }
@@ -248,10 +270,25 @@ public class NorthB
 		else
 		{
 		    //System.out.println(ostatniRegName+"|"+polecenie+" DUPA");
-		   
-			init();
-			this.regOperation(this.ostatniRegName);
-			return makeAgain(polecenie);		   
+                        try{
+                            this.closeBuffor();
+                        }
+                        catch(Exception ee)
+                        {
+                            ;
+                        }
+                        if(calosc.toString().contains("Over Max Number"))
+                        {
+                            throw new NBIAnsException(polecenie,calosc.toString()+" Over Max Number");
+                        }
+                        else
+                        {
+                            ;//init();
+                            this.ostatniRegName="";
+                            throw new NBIAnsException(polecenie,calosc.toString()+" BLEDNA ODPOWIEDZ NBI");
+                            //this.regOperation(this.ostatniRegName);
+                            //return makeAgain(polecenie);		   
+                        }
 		}
             //}
             //catch (Exception e)
@@ -304,11 +341,11 @@ public class NorthB
                 StringBuilder sb = new StringBuilder();
                 boolean found = false;
 
-                char ch = (char) in.read();
-		if(this.zapFlag)
-		    logi.dopisz(ch);
-	        while (true&&throTimeOut)
-                {
+                int sign=0;
+
+	       while((sign=in.read())>0)
+               {
+		   char ch=(char)sign;
 		    if(ch!=((char)-1))
                     sb.append(ch);
 		    if(ch!=((char)-1))
@@ -344,6 +381,7 @@ public class NorthB
 		{
 		    throw new NBIAnsException(polecenie,calosc.toString()+" THROW TIME OUT");
 		}
+
 		if(calosc!=null&&calosc.length()>0&&calosc.toString().contains(nazwaPolecenia)&&calosc.toString().contains("---    END"))
 		{
 		    //System.out.println(ostatniRegName+"|"+polecenie+" CZYTANIE OK");
@@ -356,17 +394,7 @@ public class NorthB
 
 		    throw new NBIAnsException(polecenie+"{"+ostatniRegName+"}",calosc.toString());
 		}
-            //}
-            //catch (Exception e)
-            //{
-		//System.out.println("WYwala read:");
-		//e.printStackTrace();
-		//return "ERROR";
-	    //}
-
-
-
-    }
+     }
 
     /**
      *
@@ -425,36 +453,27 @@ public class NorthB
 	*
 	*
 	*/
-        String odp="";
-                try{
-                    odp=makeNew(regName,polecenie);
-                    return odp;
-                }
-                catch(java.net.SocketException e )
-                {
-                    
-                    init();
-                    return makeNew(regName,polecenie);
-                }
-	
+
+	return makeNew(regName,polecenie);
     }
 
     public String makeNew(String regName,String polecenie) throws NBIAnsException,java.io.IOException
     {
 	//try
 	//{
-	String   odp="";
-	boolean zalogowanyNe=false;
+	String odp="";
         String nazwaPolecenia=NewFile.getTokens(polecenie, "1", "1", ":");
+       
+	int zalogowanyNe=-1;
         if(ostatniRegName!=null&&ostatniRegName.equals(regName))
         {
-            zalogowanyNe=true;
+            zalogowanyNe=1;
         }
         else
         {
             zalogowanyNe=regOperation(regName);
         }
-        if(zalogowanyNe)
+        if(zalogowanyNe==1)
         {
 	    odp=this.make2(polecenie);
 	    if(odp.contains("RETCODE = 0")&&odp.contains(nazwaPolecenia))
@@ -462,49 +481,17 @@ public class NorthB
 	    else
 	    {
 		System.out.println(regName+" "+polecenie+"\r\n"+odp);
-		;//throw new NBIAnsException("ERROR "+polecenie+"\r\n"+odp);
 	    }
-
 	}
-	//System.err.println(regName+" "+polecenie+"\r\n"+odp);
-	;
-	//throw new NBIAnsException("ERROR "+polecenie+"\r\n"+odp);
-	//}
-	//catch(Exception e)
-	/*{
-	    try{
-		e.printStackTrace();
-	    LogManager lm = LogManager.getLogManager();
-	    java.util.logging.Logger logger;
-	    FileHandler fh = new java.util.logging.FileHandler("C:\\toolPP\\log_test2.txt", true);//FileHandler("log_test2.txt");
-
-	    logger = Logger.getLogger("LoggingExample1");
-	    //Logger logger2 = Logger.getLogger("LogExamle2");
-
-	    lm.addLogger(logger);
-	    logger.setLevel(Level.ALL);
-	    fh.setFormatter(new java.util.logging.SimpleFormatter());
-
-
-	    logger.addHandler(fh);
-	    logger.log(Level.WARNING, "Blad przy komendzie:"+polecenie, e);
-	    return null;
-	    }
-	    catch(Exception ee)
-	    {
-		e.printStackTrace();
-		return null;
-	    }
-
-	}*/
+        else 
+            odp=lastRegOperation;
+	
 	return odp;
     }
 
     public String MakeWithReg(String komenda_regName) throws NBIAnsException,java.io.IOException
     {
-
-
-        if (komenda_regName != null && !komenda_regName.equals(""))
+	if (komenda_regName != null && !komenda_regName.equals(""))
         {
             String komenda = logi.getTokens(komenda_regName, "1", "1", "[{]");
             komenda = komenda.replaceAll("[{]", "");
@@ -515,37 +502,52 @@ public class NorthB
         }
         else
             return "";
-
-
     }
 
-    private boolean regOperation(String regName) throws NBIAnsException,java.io.IOException
+    private int regOperation(String regName) throws NBIAnsException,java.io.IOException
     {
         boolean regOk=false;
         lastRegOperation=this.make2("REG NE:NAME=\""+regName+"\"");
-        regOk=this.zawiera(lastRegOperation, "RETCODE = 0  Success");
-        if(regOk)
+        ;
+        if(this.zawiera(lastRegOperation, "RETCODE = 0  Success"))
+        {  
             this.ostatniRegName=regName;
-
-        return regOk;
+            return 1;
+        
+        }
+        else if(this.zawiera(lastRegOperation, "RETCODE = 1  NE does not Connection"))
+        {  
+               System.out.println(lastRegOperation);
+            //this.ostatniRegName=regName;
+            return 0;
+        
+        }
+        else
+        {
+            System.out.println(lastRegOperation);
+            return -1;
+        }
     }
 
     /**
      *
      * @return true -dla poprawnego zamkniecia bufforow, false- dla nieudanej operacji
      */
-
     public boolean closeBuffor()
     {
         try
         {
-	 
+	  
 	    String userInput="LGO:OP="+login+";\r";
+            
             out.println(userInput);
+            System.out.println(userInput);
             out.close();
+
             in.close();
+	    
             echoSocket.close();
-	    //System.out.println("ZAMKNIETE");
+	    
             return true;
 	}
         catch (UnknownHostException e)
@@ -560,6 +562,7 @@ public class NorthB
 	}
         catch(Exception e)
         {
+            System.out.println("BLA bla");
 	    e.printStackTrace();
             return false;
         }
@@ -607,20 +610,14 @@ public class NorthB
 	return str;
     }
 
-    @Override
-    protected void finalize () throws Throwable
+   @Override
+   protected void finalize () throws Throwable
     {
-
-	try{
-
-
-	    String unreg="UNREG NE:NAME=\""+this.ostatniRegName+"\";\r";
-
-	    out.println(unreg);
-	    String userInput="	LGO:OP=\""+login+"\";\r";
-
+	try
+	{
+	  
+	    String userInput="LGO:OP=\""+login+"\";\r";
             out.println(userInput);
-
             out.close();
             in.close();
             echoSocket.close();
@@ -633,8 +630,6 @@ public class NorthB
 	}
 	finally
 	{
-
-
 	    super.finalize();
 	}
     }
