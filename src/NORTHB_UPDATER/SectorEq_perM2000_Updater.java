@@ -228,7 +228,10 @@ Application Reference  =  2
                         java.util.ArrayList<Paczka> Sectors=(new NPack(lstSector,NPack.FORMAT_POZIOMY)).getAllPacks();
                         if(lstSector.contains("Number of results = 1)"))
                             Sectors=(new NPack(lstSector,NPack.FORMAT_PIONOWY)).getAllPacks();
+                        
                         java.util.ArrayList<Paczka> SectorsEq=(new NPack(lstSectorEq,NPack.FORMAT_POZIOMY)).getAllPacks();
+                        if(lstSectorEq.contains("Number of results = 1)"))
+                            SectorsEq=(new NPack(lstSectorEq,NPack.FORMAT_PIONOWY)).getAllPacks();
                         
                         String nodebId="NULL";
                         String nodebName="NULL";
