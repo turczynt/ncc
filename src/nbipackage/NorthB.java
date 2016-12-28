@@ -212,6 +212,7 @@ public class NorthB
 	    String conntPattern="To be continued...\r\n\r\n---    END";
 	    String conntPattern2="To be continued...\r\n---    END";
 	    String sendFaild="Send Command Failed";
+            String disconnectedNeErrorPatterm="NE Disconnect Information";
 	    String odpowiedz="";
 
 		
@@ -271,6 +272,7 @@ public class NorthB
 		{
 		    //System.out.println(ostatniRegName+"|"+polecenie+" DUPA");
                         try{
+                            if(!calosc.toString().contains("NE Disconnect Information"))
                             this.closeBuffor();
                         }
                         catch(Exception ee)

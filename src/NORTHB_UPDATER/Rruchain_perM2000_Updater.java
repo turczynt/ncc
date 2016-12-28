@@ -94,7 +94,10 @@ public class Rruchain_perM2000_Updater extends Updater_parrent	//extends Thread{
                             NPack nn=new NPack(lstRRUChain);
                             rruChains=nn.getAllPacks();
                         }
-                        rrus=(new NPack(lstRRU)).getAllPacks();
+                        if(lstRRU.contains("Number of results = 1)"))
+                           rrus=(new NPack(lstRRU.split("\n"), new String[]{"LST RRU:"}, new String[]{"----------"}, new String[]{"---    END"})).getAllPacks();
+                        else
+                            rrus=(new NPack(lstRRU)).getAllPacks();
                         
                         
                         if(rruChains!=null&&rruChains.size()>0&&rrus!=null&&rrus.size()>0)
