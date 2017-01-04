@@ -15,6 +15,7 @@ import java.util.logging.Logger;
  */
 public class NorthB
 {
+    
     String serwer ;
     Socket echoSocket ;
     PrintWriter out ;
