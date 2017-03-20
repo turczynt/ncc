@@ -15,7 +15,6 @@ import java.util.logging.Logger;
  */
 public class NorthB
 {
-    
     String serwer ;
     Socket echoSocket ;
     PrintWriter out ;
@@ -213,7 +212,6 @@ public class NorthB
 	    String conntPattern="To be continued...\r\n\r\n---    END";
 	    String conntPattern2="To be continued...\r\n---    END";
 	    String sendFaild="Send Command Failed";
-            String disconnectedNeErrorPatterm="NE Disconnect Information";
 	    String odpowiedz="";
 
 		
@@ -261,7 +259,7 @@ public class NorthB
 		//timer.
 		if(throTimeOut)
 		{
-		    throw new NBIAnsException(polecenie,calosc.toString()+" THROW TIME OUT");
+		    throw new NBIAnsException(polecenie,calosc.toString()+" THROW TIME OUT",NBIAnsException.DISCONNECT_PROBLEM);
 		}
 		if(calosc!=null&&calosc.length()>0&&calosc.toString().contains(nazwaPolecenia)&&calosc.toString().contains("---    END"))
 		{
@@ -272,36 +270,22 @@ public class NorthB
 		else
 		{
 		    //System.out.println(ostatniRegName+"|"+polecenie+" DUPA");
-                        try{
-                            if(!calosc.toString().contains("NE Disconnect Information"))
-                            this.closeBuffor();
-                        }
-                        catch(Exception ee)
-                        {
-                            ;
-                        }
+                        
                         if(calosc.toString().contains("Over Max Number"))
                         {
-                            throw new NBIAnsException(polecenie,calosc.toString()+" Over Max Number");
+                            throw new NBIAnsException(polecenie,calosc.toString()+" Over Max Number",NBIAnsException.DISCONNECT_PROBLEM);
+                        }
+                        else if (calosc.toString().contains("NE Disconnect Information"))
+                        {
+                        
+                            throw new NBIAnsException(polecenie,calosc.toString()+" NE Disconnect Information",NBIAnsException.DISCONNECT_PROBLEM);
                         }
                         else
                         {
-                            ;//init();
-                            this.ostatniRegName="";
                             throw new NBIAnsException(polecenie,calosc.toString()+" BLEDNA ODPOWIEDZ NBI");
-                            //this.regOperation(this.ostatniRegName);
-                            //return makeAgain(polecenie);		   
+                        
                         }
 		}
-            //}
-            //catch (Exception e)
-            //{
-		//System.out.println("WYwala read:");
-		//e.printStackTrace();
-		//return "ERROR";
-	    //}
-		
-            
 	
     }
 
@@ -406,58 +390,34 @@ public class NorthB
      * @return Odpowiedz_NBI
      */
 
-    public String make(String regName,String polecenie)  throws NBIAnsException,java.io.IOException
+    public String make(String regName,String polecenie) throws java.io.IOException,NBIAnsException
     {
-       /* boolean zalogowanyNe=false;
-        if(ostatniRegName!=null&&ostatniRegName.equals(regName))
-        {
-            zalogowanyNe=true;
+       
+        try{
+            return makeNew(regName,polecenie);
         }
-        else
+        catch(NBIAnsException ec)
         {
-            zalogowanyNe=regOperation(regName);
-        }
-        if(zalogowanyNe)
-        {
-            String   odp=this.make2(polecenie);
-	    if(this.zapFlag)
-		logi.dopisz("MAKE2="+odp+"\n");
-            if(this.zawiera(odp, "Login or Register needed")||this.zawiera(odp, "Login or Register needed"))
+            
+            if(ec.getProblem()==NBIAnsException.DISCONNECT_PROBLEM)
             {
-                if(regOperation(regName))
+                this.lastRegOperation=null;
+                try
                 {
-                    ostatniRegName=regName;
-                    odp=this.make2(polecenie);
-		    if(this.zapFlag)
-	    		logi.dopisz("MAKE2="+odp+"\n");
-                    return odp;
+                    this.closeBuffor();
                 }
-                else
-		{
-		    if(this.zapFlag)
-			logi.dopisz("lastRegOperation:MAKE2="+this.lastRegOperation+"\n");
-                    return this.lastRegOperation;
-		}
-            }
-            ostatniRegName=regName;
-	    if(this.zapFlag)
-		logi.dopisz("MAKE2="+odp+"\n");
-            return odp;
-        }
-        else
-        {
-		    if(this.zapFlag)
-			logi.dopisz("lastRegOperation:MAKE2="+this.lastRegOperation+"\n");
-                    return this.lastRegOperation;
-		}
-	*
-	* /
-	*
-	*
-	*
-	*/
+                catch(Exception e)
+                {
 
-	return makeNew(regName,polecenie);
+                }
+                finally
+                {
+                     this.init();
+
+                }
+            }
+            throw ec;
+        }
     }
 
     public String makeNew(String regName,String polecenie) throws NBIAnsException,java.io.IOException
