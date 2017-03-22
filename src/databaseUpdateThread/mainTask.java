@@ -23,7 +23,7 @@ import MML_UPDATER.MML_UCELL_perRNC_Updater;
 import NORTHB_UPDATER.DevipNe_perM200_Updater;
 import NORTHB_UPDATER.EthPort_perM2000_Updater;
 import NORTHB_UPDATER.G2GNCELL_perBsc_Updater;
-import NORTHB_UPDATER.GEXT2GCELL_perBsc_Updater;
+import NORTHB_UPDATER.GEX2GCELL_perBsc_Updater;
 import NORTHB_UPDATER.IpClk_pt_perRnc_Updater;
 import NORTHB_UPDATER.Locell_details_perRnc_Updater;
 import NORTHB_UPDATER.NodebCMCTRL_perRnc_Updater;
@@ -509,7 +509,7 @@ public class mainTask
                 MMLGlteCell.add(new MML_GLTENCELL_perBSC_Updater("MML_GLTENCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r), BSCIDENT.getValue("Rnc_Bsc_Name", r),logger, DOA,mmlDir,sprzTEST));
                 BtsEthPortGroup.add(new btsEthport_perBsc_Updater("BTSETHPORT_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 G2GNCELLGroup.add(new G2GNCELL_perBsc_Updater("G2GNCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
-                GEXT2GCELLGroup.add(new GEXT2GCELL_perBsc_Updater("GEXT2GCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
+                GEXT2GCELLGroup.add(new GEX2GCELL_perBsc_Updater("GEXT2GCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                
                 //GEXT2GCELL
             }
