@@ -289,6 +289,7 @@ public class GEX2GCELL_perBsc_Updater extends Updater_parrent
 	{
 	    loger.log(Level.FINEST,"["+this.identyfikator+"] ERROR:" , ee);
 	    return null;
+            
 	}
     }
 
