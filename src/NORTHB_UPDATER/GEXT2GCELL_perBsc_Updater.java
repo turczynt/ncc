@@ -259,7 +259,7 @@ public class GEXT2GCELL_perBsc_Updater extends Updater_parrent
 	     java.util.ArrayList<String> poleceniaK=new java.util.ArrayList<String>();
 	     java.util.ArrayList<String> poleceniaNK=new java.util.ArrayList<String>();
 	     String obecnyDzien="'"+sdf.format(DataDzisiaj)+"'";
-             String query="delete from raport_konfiguracja_aktualna.GEXT2GCELL_perBsc where last_update_date<"+obecnyDzien+" and external_rnc_bsc_index_FK="+bsc_index+";";
+             String query="delete from raport_konfiguracja_aktualna.GEXT2GCELL_perBsc where last_update<"+obecnyDzien+" and external_rnc_bsc_index_FK="+bsc_index+";";
              
             testStatement.execute(query);
 	
