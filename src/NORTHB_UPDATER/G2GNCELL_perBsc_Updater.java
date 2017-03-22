@@ -117,9 +117,14 @@ public class G2GNCELL_perBsc_Updater extends Updater_parrent
                                 String neighbor_cell_name="'"+relacja.getWartosc("Neighbor 2G Cell Name")+"'";
                                 String source_bts_index_FK="(select g.Bts_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+source_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' limit 1)";
                                 String source_gcell_index_FK="(select g.Cell_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+source_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' limit 1)";
-                                String neighbor_gcell_index_FK="(select indexy.Cell_Index from  (select g.Cell_Index as Cell_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+neighbor_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' union select e.oryginal_gcell_index_FK as Cell_Index from raport_konfiguracja_aktualna.GEXT2GCELL_perBsc e where e.external_rnc_bsc_index_FK='"+bsc_index+"' and e.external_Cell_Index='"+neighbor_cell_index+"') as indexy limit 1)";     
+                                String neighbor_gcell_index_FK=//"(select indexy.Cell_Index from  (select g.Cell_Index as Cell_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+neighbor_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' limit 1 union select e.oryginal_gcell_index_FK as Cell_Index from raport_konfiguracja_aktualna.GEXT2GCELL_perBsc e where e.external_rnc_bsc_index_FK='"+bsc_index+"' and e.external_Cell_Index='"+neighbor_cell_index+"' limit 1) as indexy limit 1)";     
                                 //"(select g.Cell_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+neighbor_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' limit 1)";
-                                 String insert="INSERT INTO `raport_konfiguracja_aktualna`.`G2GNCELL_perBsc` "
+                               //
+"(SELECT COALESCE(	(select g.Cell_Index as Cell_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+neighbor_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' limit 1),	(select e.oryginal_gcell_index_FK as Cell_Index from raport_konfiguracja_aktualna.GEXT2GCELL_perBsc e where e.external_rnc_bsc_index_FK='"+bsc_index+"' and e.external_Cell_Index='"+neighbor_cell_index+"' limit 1)) as Cell_Index)";
+                                
+                                
+                                
+                                String insert="INSERT INTO `raport_konfiguracja_aktualna`.`G2GNCELL_perBsc` "
                                          + "("
                                             + "source_rnc_bsc_index_FK,"
                                             + "source_cell_index,"
@@ -145,6 +150,7 @@ public class G2GNCELL_perBsc_Updater extends Updater_parrent
                                          + " ON DUPLICATE KEY UPDATE "
                                             + "source_cell_name="+source_cell_name+","
                                             + "neighbor_cell_name="+neighbor_cell_name+","
+                                            + "neighbor_gcell_index_FK=(	 	IF( neighbor_gcell_index_FK IS NULL,(SELECT COALESCE( (select g.Cell_Index as Cell_Index from oncall.konfiguracja_aktualna_gcell g  where g.Cell_Id='"+neighbor_cell_index+"' and g.Bts_Index like '"+bsc_index+"|%' limit 1),	(select e.oryginal_gcell_index_FK as Cell_Index from raport_konfiguracja_aktualna.GEXT2GCELL_perBsc e where e.external_rnc_bsc_index_FK='"+bsc_index+"' and e.external_Cell_Index='"+neighbor_cell_index+"' limit 1)			)			),			neighbor_gcell_index_FK 		)	 ),"
                                             +"last_update="+obecnyDzienCzas+";";
                                  
                                   // System.out.println(insert);
@@ -210,7 +216,7 @@ public class G2GNCELL_perBsc_Updater extends Updater_parrent
 	     java.util.ArrayList<String> poleceniaK=new java.util.ArrayList<String>();
 	     java.util.ArrayList<String> poleceniaNK=new java.util.ArrayList<String>();
 	     String obecnyDzien="'"+sdf.format(DataDzisiaj)+"'";
-             String query="delete from raport_konfiguracja_aktualna.G2GNCELL_perBsc where last_update_date<"+obecnyDzien+" and bt.source_rnc_bsc_index_FK='"+bsc_index+"');";
+             String query="delete from raport_konfiguracja_aktualna.G2GNCELL_perBsc where last_update<"+obecnyDzien+" and source_rnc_bsc_index_FK='"+bsc_index+"';";
              
             testStatement.execute(query);
 	
