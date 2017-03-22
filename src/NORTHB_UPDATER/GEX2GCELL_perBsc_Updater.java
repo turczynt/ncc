@@ -18,9 +18,9 @@ import nbipackage.Paczka;
  *
  * @author turczyt
  */
-public class GEXT2GCELL_perBsc_Updater extends Updater_parrent
+public class GEX2GCELL_perBsc_Updater extends Updater_parrent
 {
-     public GEXT2GCELL_perBsc_Updater(String identyfikator,String bscName,int typOperacji,Logger loger,mysqlpackage.DataSource DOA,NewFile sprzF)
+     public GEX2GCELL_perBsc_Updater(String identyfikator,String bscName,int typOperacji,Logger loger,mysqlpackage.DataSource DOA,NewFile sprzF)
     {
 	super(identyfikator,bscName,typOperacji,loger,DOA,sprzF);
     }
