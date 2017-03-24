@@ -23,7 +23,9 @@ import MML_UPDATER.MML_UCELL_perRNC_Updater;
 import NORTHB_UPDATER.DevipNe_perM200_Updater;
 import NORTHB_UPDATER.EthPort_perM2000_Updater;
 import NORTHB_UPDATER.G2GNCELL_perBsc_Updater;
+import NORTHB_UPDATER.G3GNCELL_perBsc_Updater;
 import NORTHB_UPDATER.GEX2GCELL_perBsc_Updater;
+import NORTHB_UPDATER.GEX3GCELL_perBsc_Updater;
 import NORTHB_UPDATER.IpClk_pt_perRnc_Updater;
 import NORTHB_UPDATER.Locell_details_perRnc_Updater;
 import NORTHB_UPDATER.NodebCMCTRL_perRnc_Updater;
@@ -36,6 +38,7 @@ import NORTHB_UPDATER.Nodeb_rscgrp_perRnc_Updater;
 import NORTHB_UPDATER.PtpBvc_perBsc_Updater;
 import NORTHB_UPDATER.Rruchain_perM2000_Updater;
 import NORTHB_UPDATER.SectorEq_perM2000_Updater;
+import NORTHB_UPDATER.UEXT2GCELL_perRnc_Updater;
 import NORTHB_UPDATER.btsEthport_perBsc_Updater;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -126,7 +129,11 @@ public class mainTask
         boolean SEQTOR_EQ=false;
         boolean RSCGRP=false;
         boolean G2GNCELL=false;
+        boolean G3GNCELL=false;
         boolean GEXT2GCELL=false;
+        boolean GEXT3GCELL=false;
+        boolean UEXT2GCELL=false;
+        
    
         
         boolean MML_BTS=false;
@@ -171,7 +178,11 @@ public class mainTask
                 System.out.println("\t\t ETHPORT(wybrane parametry z DSP ETHPORT: na kazdym NE: L/U/UL)");
                 System.out.println("\t\t ETHPORTBSC(wybrane parametry z DSP BTSETHPORT: na kazdym BTS)");
                 System.out.println("\t\t G2GNCELL(relacje 2G-->2G LST G2GNCELL:; na kazdym BSC)");
+                System.out.println("\t\t G3GNCELL(relacje 3G-->2G LST G3GNCELL:; na kazdym BSC)");
                 System.out.println("\t\t GEXT2GCELL( externale gcell na kazdym BSC)");
+                System.out.println("\t\t GEXT3GCELL( externale ucell na kazdym BSC)");
+                 System.out.println("\t\t UEXT2GCELL( externale gcell na kazdym RNC)");
+                
                 System.out.println("\t\t RRUCHAIN(wybrane parametry z LST RRU/RRUCHAIN na kazdym NE: L/U/UL)");
                 System.out.println("\t\t RSCGRP(parametryzacja LST RSCGRP: na kazdym U/UL");
                 System.out.println("\t\t SEQTOR_EQ(parametryzacja LST SECTOR\\SECTOREQUIPMENT na kazdym NE");
@@ -250,9 +261,17 @@ public class mainTask
                             ETHPORTBSC=true;
                         if(modulTok[a].equalsIgnoreCase("G2GNCELL"))
                             G2GNCELL=true;
+                        if(modulTok[a].equalsIgnoreCase("G3GNCELL"))
+                            G3GNCELL=true;
+                        
                         
                         if(modulTok[a].equalsIgnoreCase("GEXT2GCELL"))
                             GEXT2GCELL=true;
+                        if(modulTok[a].equalsIgnoreCase("GEXT3GCELL"))
+                            GEXT3GCELL=true;
+                        if(modulTok[a].equalsIgnoreCase("UEXT2GCELL"))
+                            UEXT2GCELL=true;
+                        
                         if(modulTok[a].equalsIgnoreCase("RRUCHAIN"))
                             RRUCHAIN=true;
                         if(modulTok[a].equalsIgnoreCase("RSCGRP"))
@@ -296,7 +315,10 @@ public class mainTask
                         ETHPORT=true;
                         ETHPORTBSC=true;
                         G2GNCELL=true;
+                        G3GNCELL=true;
                         GEXT2GCELL=true;
+                        GEXT3GCELL=true;
+                        UEXT2GCELL=true;
                         RRUCHAIN=true;
                         RSCGRP=true;
                         SEQTOR_EQ=true;
@@ -463,6 +485,7 @@ public class mainTask
             GrupaZadan IPCLK_GR=new GrupaZadan(4,"IPCLK_PT",logger);
             GrupaZadan FLOWCTRLPARA_GR=new GrupaZadan(4,"FLOWCTRLPARA_NODE",logger);
             GrupaZadan RSCGRP_GR=new GrupaZadan(4,"RSCGRP",logger);
+            GrupaZadan UEXT2GCELLGroup=new GrupaZadan(4,"UEXT2GCELL",logger);
             
             //RSCGRP
             	    
@@ -483,8 +506,8 @@ public class mainTask
                 CMCTRL_GR.add(new NodebCMCTRL_perRnc_Updater("CMCTRL_STATE_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 IPCLK_GR.add(new IpClk_pt_perRnc_Updater("IPCLK_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 FLOWCTRLPARA_GR.add(new Nodeb_dlflowcontrolpara_perRnc_Updater("FLOWCTRLPARA_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
-                
                 RSCGRP_GR.add(new Nodeb_rscgrp_perRnc_Updater("RSCGRP_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
+                UEXT2GCELLGroup.add(new UEXT2GCELL_perRnc_Updater("UEXT2GCELL_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
             }   
             
             ///////////////////////////////////////////////////////
@@ -496,7 +519,12 @@ public class mainTask
             GrupaZadan PtpBvcGroup=new GrupaZadan(4,"PtpBvc",logger);
             GrupaZadan BtsEthPortGroup=new GrupaZadan(4,"BtsEthPort",logger);
             GrupaZadan G2GNCELLGroup=new GrupaZadan(4,"G2GNCELL",logger);
+            GrupaZadan G3GNCELLGroup=new GrupaZadan(4,"G3GNCELL",logger);
+            
             GrupaZadan GEXT2GCELLGroup=new GrupaZadan(4,"GEXT2GCELL",logger);
+            GrupaZadan GEXT3GCELLGroup=new GrupaZadan(4,"GEXT3GCELL",logger);
+            
+            
             
             for(int r=0;BSCIDENT!=null&&r<BSCIDENT.rowCount();r++)
             {
@@ -510,6 +538,9 @@ public class mainTask
                 BtsEthPortGroup.add(new btsEthport_perBsc_Updater("BTSETHPORT_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 G2GNCELLGroup.add(new G2GNCELL_perBsc_Updater("G2GNCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 GEXT2GCELLGroup.add(new GEX2GCELL_perBsc_Updater("GEXT2GCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
+                G3GNCELLGroup.add(new G3GNCELL_perBsc_Updater("G3GNCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
+                
+                GEXT3GCELLGroup.add(new GEX3GCELL_perBsc_Updater("GEXT3GCELL_"+BSCIDENT.getValue("Rnc_Bsc_Name", r),BSCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                
                 //GEXT2GCELL
             }
@@ -634,12 +665,18 @@ public class mainTask
                 pool.add2KolejkaGrup(ethPort_update);
             if(ETHPORTBSC||!wybraneModuly)
                 pool.add2KolejkaGrup(BtsEthPortGroup);
-            if(G2GNCELL||!wybraneModuly)
-                pool.add2KolejkaGrup(G2GNCELLGroup);
              if(GEXT2GCELL||!wybraneModuly)
                 pool.add2KolejkaGrup(GEXT2GCELLGroup);
-            
-            
+             if(GEXT3GCELL||!wybraneModuly)
+                 pool.add2KolejkaGrup(GEXT3GCELLGroup);
+             if(UEXT2GCELL||!wybraneModuly)
+                 pool.add2KolejkaGrup(UEXT2GCELLGroup);
+             
+             
+             if(G2GNCELL||!wybraneModuly)
+                pool.add2KolejkaGrup(G2GNCELLGroup);
+             if(G3GNCELL||!wybraneModuly)
+                pool.add2KolejkaGrup(G3GNCELLGroup);
             if(RRUCHAIN||!wybraneModuly)
                 pool.add2KolejkaGrup(Rruchain_update);
             
