@@ -54,19 +54,19 @@ public class UEXT2GCELL_perRnc_Updater extends Updater_parrent
 		String m2000_Index=rnc.getValue("M2000_Index", 0);
 		north=new nbipackage.NorthB(m2000_ip, "U-boot", "utranek098",null);
 		this.errorInfo=this.errorInfo+"; connect with "+m2000_ip+" by NorthB";
-		lstBts=north.make(this.kontrolerName, "LST GEXT2GCELL:;");
+		lstBts=north.make(this.kontrolerName, "LST UEXT2GCELL:LSTFORMAT=HORIZONTAL;");
 
 		if(lstBts!=null&&lstBts.contains("RETCODE = 0"))
 		{
 		    //sukces = true;
-		    System.out.println(this.identyfikator+" LST GEXT2GCELL: wykonane");
-		    this.errorInfo=this.errorInfo+"; POBRANE LST GEXT2GCELL:";
+		    System.out.println(this.identyfikator+" LST UEXT2GCELL:LSTFORMAT=HORIZONTAL: wykonane");
+		    this.errorInfo=this.errorInfo+"; POBRANE LST UEXT2GCELL:LSTFORMAT=HORIZONTAL";
 		}
 		else
 		{
-		    System.out.println(this.identyfikator+" LST GEXT2GCELL: ERROR");
+		    System.out.println(this.identyfikator+" LST UEXT2GCELL:LSTFORMAT=HORIZONTAL ERROR");
 
-		    this.errorInfo=this.errorInfo+"; BLAD W POBIERANIU POBRANE LST G2GNCELL:";
+		    this.errorInfo=this.errorInfo+"; BLAD W POBIERANIU POBRANE LST UEXT2GCELL:LSTFORMAT=HORIZONTAL";
 		    sukces=false;
 
 		}
@@ -85,7 +85,7 @@ public class UEXT2GCELL_perRnc_Updater extends Updater_parrent
 		    }
 		    catch(Exception ewqr)
 		    {
-			System.err.println("WYJEBALO przy NPack LST PTPBVC:;");
+			
 			loger.log(Level.FINEST, "["+this.identyfikator+"]ERROR ", ewqr);
                          sukces=false;
 		    }
@@ -96,7 +96,7 @@ public class UEXT2GCELL_perRnc_Updater extends Updater_parrent
 			for(int u=0;u<relacje2g2g.size();u++)
 			{
 			    Paczka relacja=relacje2g2g.get(u);
-			    if(relacja!=null&&relacja.getWartosc("Cell Index")!=null&&relacja.getWartosc("Cell Index").length()>0)
+			    if(relacja!=null&&relacja.getWartosc("GSM Cell Index")!=null&&relacja.getWartosc("GSM Cell Index").length()>0)
 			    {
 
 				
@@ -121,7 +121,9 @@ public class UEXT2GCELL_perRnc_Updater extends Updater_parrent
                                 String external_Cell_Name="'"+relacja.getWartosc("GSM Cell Name")+"'";
                                 String lac_dec=relacja.getWartosc("Location Area Code");
                                 String Ci_dec=relacja.getWartosc("GSM cell ID");
-                                try{
+                                 String rac_dec="'"+relacja.getWartosc("Routing area code")+"'";
+                                try
+                                {
                                     if (lac_dec.contains("("))
                                     {
                                         lac_dec =  lac_dec.substring(lac_dec.indexOf("(") + 1, lac_dec.indexOf(")"));
@@ -129,6 +131,10 @@ public class UEXT2GCELL_perRnc_Updater extends Updater_parrent
                                     if (Ci_dec.contains("("))
                                     {
                                         Ci_dec = Ci_dec.substring(Ci_dec.indexOf("(") + 1, Ci_dec.indexOf(")"));
+                                    }
+                                    if (rac_dec.contains("("))
+                                    {
+                                        rac_dec = rac_dec.substring(rac_dec.indexOf("(") + 1, rac_dec.indexOf(")"));
                                     }
                                 }catch (Exception e){
                                     loger.log(Level.FINEST, "[" + this.identyfikator + "]ERROR:", e);
@@ -138,8 +144,8 @@ public class UEXT2GCELL_perRnc_Updater extends Updater_parrent
                                 String MNC=relacja.getWartosc("Mobile network code");
                                 String NCC=relacja.getWartosc("Network Color Code");
                                 String BCC=relacja.getWartosc("BS Color Code");
-                                String Inter_Rat_Freq_num=relacja.getWartosc("Inter-RAT Cell Frequency Band Indicator");
-                                String rac_dec="'"+relacja.getWartosc("Routing area code")+"'";
+                                String Inter_Rat_Freq_num=relacja.getWartosc("Inter-RAT Cell Frequency Number");
+                               
                                 String oryginal_gcell_index_FK="(select g.Cell_Index from oncall.konfiguracja_aktualna_gcell g where g.Ci_dec="+Ci_dec+" and g.Lac_dec="+lac_dec+" limit 1)";
                                 String oryginal_gcell_rnc_bsc_index_FK="(select b.Rnc_Bsc_Index from oncall.konfiguracja_aktualna_bts b where b.Bts_Index=(select g.Bts_Index from oncall.konfiguracja_aktualna_gcell g where g.Ci_dec="+Ci_dec+" and g.Lac_dec="+lac_dec+" limit 1))";
                                 

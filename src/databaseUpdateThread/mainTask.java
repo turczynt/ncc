@@ -38,6 +38,7 @@ import NORTHB_UPDATER.Nodeb_rscgrp_perRnc_Updater;
 import NORTHB_UPDATER.PtpBvc_perBsc_Updater;
 import NORTHB_UPDATER.Rruchain_perM2000_Updater;
 import NORTHB_UPDATER.SectorEq_perM2000_Updater;
+import NORTHB_UPDATER.U2GNCELL_perRnc_Updater;
 import NORTHB_UPDATER.UEXT2GCELL_perRnc_Updater;
 import NORTHB_UPDATER.btsEthport_perBsc_Updater;
 import java.sql.Connection;
@@ -133,6 +134,7 @@ public class mainTask
         boolean GEXT2GCELL=false;
         boolean GEXT3GCELL=false;
         boolean UEXT2GCELL=false;
+        boolean U2GNCELL=false;
         
    
         
@@ -181,7 +183,8 @@ public class mainTask
                 System.out.println("\t\t G3GNCELL(relacje 3G-->2G LST G3GNCELL:; na kazdym BSC)");
                 System.out.println("\t\t GEXT2GCELL( externale gcell na kazdym BSC)");
                 System.out.println("\t\t GEXT3GCELL( externale ucell na kazdym BSC)");
-                 System.out.println("\t\t UEXT2GCELL( externale gcell na kazdym RNC)");
+                System.out.println("\t\t UEXT2GCELL( externale gcell na kazdym RNC)");
+                System.out.println("\t\t U2GNCELL( relacje 2G-->3G na kazdym RNC)");
                 
                 System.out.println("\t\t RRUCHAIN(wybrane parametry z LST RRU/RRUCHAIN na kazdym NE: L/U/UL)");
                 System.out.println("\t\t RSCGRP(parametryzacja LST RSCGRP: na kazdym U/UL");
@@ -271,6 +274,8 @@ public class mainTask
                             GEXT3GCELL=true;
                         if(modulTok[a].equalsIgnoreCase("UEXT2GCELL"))
                             UEXT2GCELL=true;
+                         if(modulTok[a].equalsIgnoreCase("U2GNCELL"))
+                            U2GNCELL=true;
                         
                         if(modulTok[a].equalsIgnoreCase("RRUCHAIN"))
                             RRUCHAIN=true;
@@ -319,6 +324,7 @@ public class mainTask
                         GEXT2GCELL=true;
                         GEXT3GCELL=true;
                         UEXT2GCELL=true;
+                        U2GNCELL=true;
                         RRUCHAIN=true;
                         RSCGRP=true;
                         SEQTOR_EQ=true;
@@ -486,6 +492,7 @@ public class mainTask
             GrupaZadan FLOWCTRLPARA_GR=new GrupaZadan(4,"FLOWCTRLPARA_NODE",logger);
             GrupaZadan RSCGRP_GR=new GrupaZadan(4,"RSCGRP",logger);
             GrupaZadan UEXT2GCELLGroup=new GrupaZadan(4,"UEXT2GCELL",logger);
+            GrupaZadan U2GNCELLGroup=new GrupaZadan(4,"U2GNCELL",logger);
             
             //RSCGRP
             	    
@@ -508,6 +515,9 @@ public class mainTask
                 FLOWCTRLPARA_GR.add(new Nodeb_dlflowcontrolpara_perRnc_Updater("FLOWCTRLPARA_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 RSCGRP_GR.add(new Nodeb_rscgrp_perRnc_Updater("RSCGRP_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
                 UEXT2GCELLGroup.add(new UEXT2GCELL_perRnc_Updater("UEXT2GCELL_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
+                U2GNCELLGroup.add(new U2GNCELL_perRnc_Updater("U2GNCELL_"+RNCIDENT.getValue("Rnc_Bsc_Name", r),RNCIDENT.getValue("Rnc_Bsc_Name", r),UpdaterInterface.ADD,logger,DOA,sprzTEST));
+                
+                
             }   
             
             ///////////////////////////////////////////////////////
@@ -624,7 +634,7 @@ public class mainTask
             if(MML_ANI||!wybraneModuly)
 		poolMML.add2KolejkaGrup(MML_Adjnode);
 	    if(MML_UCELL||!wybraneModuly)
-		poolMML.add2KolejkaGrup(MMLUcell);
+                    poolMML.add2KolejkaGrup(MMLUcell);
             if(MML_BTS||!wybraneModuly)
                 poolMML.add2KolejkaGrup(MMLBts);
             if(MML_GCELL||!wybraneModuly)
@@ -671,6 +681,8 @@ public class mainTask
                  pool.add2KolejkaGrup(GEXT3GCELLGroup);
              if(UEXT2GCELL||!wybraneModuly)
                  pool.add2KolejkaGrup(UEXT2GCELLGroup);
+             if(U2GNCELL||!wybraneModuly)
+                 pool.add2KolejkaGrup(U2GNCELLGroup);
              
              
              if(G2GNCELL||!wybraneModuly)
