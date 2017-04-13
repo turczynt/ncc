@@ -18,9 +18,9 @@ import nbipackage.Paczka;
  *
  * @author turczyt
  */
-public class UEXT3GCELL_perRnc_Updater extends Updater_parrent
+public class UEXTLTECELL_perRnc_Updater extends Updater_parrent
 {
-     public UEXT3GCELL_perRnc_Updater(String identyfikator,String rncName,int typOperacji,Logger loger,mysqlpackage.DataSource DOA,NewFile sprzF)
+     public UEXTLTECELL_perRnc_Updater(String identyfikator,String rncName,int typOperacji,Logger loger,mysqlpackage.DataSource DOA,NewFile sprzF)
     {
 	super(identyfikator,rncName,typOperacji,loger,DOA,sprzF);
     }
@@ -54,17 +54,17 @@ public class UEXT3GCELL_perRnc_Updater extends Updater_parrent
 		String m2000_Index=rnc.getValue("M2000_Index", 0);
 		north=new nbipackage.NorthB(m2000_ip, "U-boot", "utranek098",null);
 		this.errorInfo=this.errorInfo+"; connect with "+m2000_ip+" by NorthB";
-		lstBts=north.make(this.kontrolerName, "LST UEXT3GCELL:LSTFORMAT=HORIZONTAL;");
+		lstBts=north.make(this.kontrolerName, "LST ULTECELL:LSTFORMAT=HORIZONTAL;");
 
 		if(lstBts!=null&&lstBts.contains("RETCODE = 0"))
 		{
 		    //sukces = true;
-		    System.out.println(this.identyfikator+" LST UEXT3GCELL:LSTFORMAT=HORIZONTAL: wykonane");
-		    this.errorInfo=this.errorInfo+"; POBRANE LST UEXT3GCELL:LSTFORMAT=HORIZONTAL";
+		    System.out.println(this.identyfikator+" LST ULTECELL:LSTFORMAT=HORIZONTAL: wykonane");
+		    this.errorInfo=this.errorInfo+"; POBRANE LST ULTECELL:LSTFORMAT=HORIZONTAL";
 		}
 		else
 		{
-		    System.out.println(this.identyfikator+" LST UEXT3GCELL:LSTFORMAT=HORIZONTAL ERROR");
+		    System.out.println(this.identyfikator+" LST ULTECELL:LSTFORMAT=HORIZONTAL ERROR");
 
 		    this.errorInfo=this.errorInfo+"; BLAD W POBIERANIU POBRANE LST UEXT2GCELL:LSTFORMAT=HORIZONTAL";
 		    sukces=false;
@@ -104,86 +104,80 @@ public class UEXT3GCELL_perRnc_Updater extends Updater_parrent
                                 `external_rnc_bsc_index_FK` INT(11) NOT NULL,
                                 `external_Cell_Name` VARCHAR(50) NULL DEFAULT NULL,
                                 `external_Cell_Index` INT(11) NOT NULL,
-                                `lac_dec` INT(11) NULL DEFAULT NULL,
-                                `neigh_rnc_id` INT(11) NULL DEFAULT NULL,
-                                `Scrambling_code` INT(11) NULL DEFAULT NULL,
-                                `Route_Area` INT(11) NULL DEFAULT NULL,
-                                `UARFCN` INT(11) NULL DEFAULT NULL,
-                                `oryginal_ucell_rnc_id` INT(11) NULL DEFAULT NULL COMMENT 'wartosc "RNC ID" LST UEXT3GCELL:',
+                                `EUTRAN_Cell_Identity` INT(11) NOT NULL,
+                                `PCID` INT(11) NULL DEFAULT NULL,
+                                `MCC` INT(11) NULL DEFAULT NULL,
+                                `MNC` INT(11) NULL DEFAULT NULL,
+                                `TAC` INT(11) NULL DEFAULT NULL,
+                                `DL_FREQ` INT(11) NULL DEFAULT NULL,
+                                `GCNOPGRPINDEX` INT(11) NULL DEFAULT NULL,
+                                `BlackCell_lst_flag` INT(2) NULL DEFAULT NULL,
                                 `last_update` DATETIME NULL DEFAULT NULL,
-                                `oryginal_ucell_rnc_rnc_index_FK` INT(11) NULL DEFAULT NULL COMMENT 'index from oncall.konfiguracja_aktualna_rnc_bsc',
-                                `oryginal_ucell_index_FK` VARCHAR(50) NULL DEFAULT NULL COMMENT 'cell_index from oncall.konfiguracja_aktualna_ucell',
+                                `oryginal_enodeb_index_FK` INT(11) NULL DEFAULT NULL COMMENT 'index from oncall.konfiguracja_aktualna_enodeb',
+                                `oryginal_ecell_index_FK` VARCHAR(50) NULL DEFAULT NULL COMMENT 'cell_index from oncall.konfiguracja_aktualna_ecell',
                                  */                                
                                 String external_rnc_bsc_index_FK=rnc_index;
-                                String external_Cell_Index=relacja.getWartosc("Cell ID of Neighboring RNC");
-                                String external_Cell_Name="'"+relacja.getWartosc("Cell Name")+"'";
-                                String lac_dec=relacja.getWartosc("Location Area Code");
-                                String neigh_rnc_id=relacja.getWartosc("Neighboring RNC ID");
-                                String rac_dec=relacja.getWartosc("Routing area code");
-                                try
-                                {
-                                    if (lac_dec.contains("("))
-                                    {
-                                        lac_dec =  lac_dec.substring(lac_dec.indexOf("(") + 1, lac_dec.indexOf(")"));
-                                    }
-                                   
-                                    if (rac_dec.contains("("))
-                                    {
-                                        rac_dec = rac_dec.substring(rac_dec.indexOf("(") + 1, rac_dec.indexOf(")"));
-                                    }
-                                    else if(rac_dec.toUpperCase().contains("<NULL>"))
-                                    {
-                                        rac_dec="-1";
-                                    }
-                                }catch (Exception e){
-                                    loger.log(Level.FINEST, "[" + this.identyfikator + "]ERROR:", e);
-                                }
-                                String Scrambling_code=relacja.getWartosc("DL Primary Scrambling Code");
-                                String UARFCN=relacja.getWartosc("Downlink UARFCN");
-                               
-                                //String oryginal_ucell_rnc_id="'"+relacja.getWartosc("RNC ID")+"'";
-                                String oryginal_ucell_index_FK="(select g.Cell_Index from oncall.konfiguracja_aktualna_ucell g where g.Cell_Id="+external_Cell_Index+" and g.Lac_dec="+lac_dec+" limit 1)";
-                                String oryginal_ucell_rnc_rnc_index_FK="(select b.Rnc_Bsc_Index from oncall.konfiguracja_aktualna_nodeb b where b.Nodeb_Index=(select g.Nodeb_Index from oncall.konfiguracja_aktualna_ucell g where  g.Cell_Id="+external_Cell_Index+" and g.Lac_dec="+lac_dec+" limit 1))";
+                                String external_Cell_Index=relacja.getWartosc("LTE Cell Index");
+                                String external_Cell_Name="'"+relacja.getWartosc("LTE Cell Name")+"'";
+                                String EUTRAN_Cell_Identity=relacja.getWartosc("EUTRAN Cell Identity");
+                                String PCID=relacja.getWartosc("LTE Physical Cell Identity");
+                                String MCC=relacja.getWartosc("Mobile Country Code");
+                                String MNC=relacja.getWartosc("Mobile Network Code");
+                                String TAC=relacja.getWartosc("Tracking Area Code");
+                                String DL_FREQ=relacja.getWartosc("LTE Cell Downlink Frequency");
+                                String GCNOPGRPINDEX=relacja.getWartosc("Operator Group Index");
+                                String BlackCell_lst_flag=relacja.getWartosc("BlackCell List Flag");
+                                String oryginal_enodeb_index_FK="(select e.Enodeb_Index from oncall.konfiguracja_aktualna_ecell e where e.Cell_Name='"+external_Cell_Name+"' limit 1)";
+                                String oryginal_ecell_index_FK="(select e.Cell_Index from oncall.konfiguracja_aktualna_ecell e where e.Cell_Name='"+external_Cell_Name+"' limit 1)";
                                 
                              
                                 
                                 
-                                 String insert="INSERT INTO `raport_konfiguracja_aktualna`.`UEXT3GCELL_perRnc` "
+                                 String insert="INSERT INTO `raport_konfiguracja_aktualna`.`UEXTLTECELL_perRnc` "
                                          + "("
                                             + "external_rnc_bsc_index_FK,"
                                             + "external_Cell_Index,"
                                             + "external_Cell_Name,"
-                                            + "lac_dec,"
-                                            + "neigh_rnc_id,"
-                                            + "Scrambling_code,"
-                                            + "UARFCN,"
-                                            + "rac_dec,"                                        
-                                            + "oryginal_ucell_index_FK,"                                        
-                                            + "oryginal_ucell_rnc_rnc_index_FK,"                                        
+                                            + "EUTRAN_Cell_Identity,"
+                                            + "PCID,"
+                                            + "MCC,"
+                                            + "MNC,"
+                                            + "TAC," 
+                                            + "DL_FREQ,"
+                                            + "GCNOPGRPINDEX,"
+                                            + "BlackCell_lst_flag,"
+                                            + "oryginal_enodeb_index_FK,"                                        
+                                            + "oryginal_ecell_index_FK,"                                        
                                             + "last_update"
                                          + ") VALUES"
                                          + "("
                                             + external_rnc_bsc_index_FK+","
                                             + external_Cell_Index+","
                                             + external_Cell_Name+","
-                                            + lac_dec+","
-                                            + neigh_rnc_id+","
-                                            + Scrambling_code+","
-                                            + UARFCN+","
-                                            + rac_dec+","
-                                            + oryginal_ucell_index_FK+","
-                                            + oryginal_ucell_rnc_rnc_index_FK+","
+                                            + EUTRAN_Cell_Identity+","
+                                            + PCID+","
+                                            + MCC+","
+                                            + MNC+","
+                                            + TAC+","
+                                            + DL_FREQ+","
+                                            + GCNOPGRPINDEX+","
+                                            + BlackCell_lst_flag+","
+                                            + oryginal_enodeb_index_FK+","                                        
+                                            + oryginal_ecell_index_FK+","
                                             + obecnyDzienCzas+""
                                          + ")"
                                          + " ON DUPLICATE KEY UPDATE "
                                             + "external_Cell_Name="+external_Cell_Name+","
-                                            + "lac_dec="+lac_dec+","
-                                            + "neigh_rnc_id="+neigh_rnc_id+","
-                                            + "Scrambling_code="+Scrambling_code+","
-                                            + "UARFCN="+UARFCN+","
-                                            + "rac_dec="+rac_dec+","
-                                            + "oryginal_ucell_index_FK="+oryginal_ucell_index_FK+","
-                                            + "oryginal_ucell_rnc_rnc_index_FK="+oryginal_ucell_rnc_rnc_index_FK+","
+                                            + "EUTRAN_Cell_Identity="+EUTRAN_Cell_Identity+","
+                                            + "PCID="+PCID+","
+                                            + "MCC="+MCC+","
+                                            + "MNC="+MNC+","
+                                            + "TAC="+TAC+","
+                                            + "DL_FREQ="+DL_FREQ+","
+                                            + "GCNOPGRPINDEX="+GCNOPGRPINDEX+","
+                                            + "BlackCell_lst_flag="+BlackCell_lst_flag+","
+                                            + "oryginal_enodeb_index_FK="+oryginal_enodeb_index_FK+","                                        
+                                            + "oryginal_ecell_index_FK="+oryginal_ecell_index_FK+","
                                             + "last_update="+obecnyDzienCzas+";";
                                  
                                  //  System.out.println(insert);
@@ -249,7 +243,7 @@ public class UEXT3GCELL_perRnc_Updater extends Updater_parrent
 	     java.util.ArrayList<String> poleceniaK=new java.util.ArrayList<String>();
 	     java.util.ArrayList<String> poleceniaNK=new java.util.ArrayList<String>();
 	     String obecnyDzien="'"+sdf.format(DataDzisiaj)+"'";
-             String query="delete from raport_konfiguracja_aktualna.UEXT3GCELL_perRnc where last_update<"+obecnyDzien+" and external_rnc_bsc_index_FK="+rnc_index+";";
+             String query="delete from raport_konfiguracja_aktualna.UEXTLTECELL_perRnc where last_update<"+obecnyDzien+" and external_rnc_bsc_index_FK="+rnc_index+";";
              
             testStatement.execute(query);
 	
@@ -270,7 +264,7 @@ public class UEXT3GCELL_perRnc_Updater extends Updater_parrent
 	String obecnyDzien="'"+sdf.format(dateBefore)+"'";
 	try
 	{
-	    String req="select * from `raport_konfiguracja_aktualna`.`UEXT3GCELL_perRnc` bt where(bt.last_update<"+obecnyDzien+" and bt.external_rnc_bsc_index_FK='"+rnc_index+"');";
+	    String req="select * from `raport_konfiguracja_aktualna`.`UEXTLTECELL_perRnc` bt where(bt.last_update<"+obecnyDzien+" and bt.external_rnc_bsc_index_FK='"+rnc_index+"');";
 	    ResultSet res=testStatement.executeQuery(req);
 	    OdpowiedzSQL rnc=Baza.createAnswer(res);
 	    return rnc;
