@@ -135,7 +135,7 @@ public class UEXT3GCELL_perRnc_Updater extends Updater_parrent
                                     loger.log(Level.FINEST, "[" + this.identyfikator + "]ERROR:", e);
                                 }
                                 String Scrambling_code=relacja.getWartosc("DL Primary Scrambling Code");
-                                String UARFCN=relacja.getWartosc("Uplink UARFCN");
+                                String UARFCN=relacja.getWartosc("Downlink UARFCN");
                                
                                 //String oryginal_ucell_rnc_id="'"+relacja.getWartosc("RNC ID")+"'";
                                 String oryginal_ucell_index_FK="(select g.Cell_Index from oncall.konfiguracja_aktualna_ucell g where g.Cell_Id="+external_Cell_Index+" and g.Lac_dec="+lac_dec+" limit 1)";
